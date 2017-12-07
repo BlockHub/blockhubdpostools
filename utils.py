@@ -71,3 +71,29 @@ def arkt_to_unixt(ark_timestamp):
 def datetime_to_arkt(datetime):
     """convert a datetime object to ark timestamp"""
     return datetime.timestamp() - datetime.datetime(2017, 3, 21, 15, 55, 44).timestamp
+
+
+def dictionify(resultset, labelset, single=False, return_list=False):
+    if not single and not return_list:
+        res = {}
+        for i in resultset:
+            row = {}
+            for a, b in zip(i, labelset):
+                row.update({b: a})
+            res.update({i[0]: row})
+        return res
+
+    if not single and return_list:
+        res = []
+        for i in resultset:
+            row = {}
+            for a, b in zip(i, labelset):
+                row.update({b: a})
+            res.append(row)
+        return res
+
+    else:
+        res = {}
+        for a, b in zip(resultset, labelset):
+            res.update({b: a})
+        return res

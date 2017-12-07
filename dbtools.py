@@ -4,22 +4,7 @@ from arky import api
 from schemes import schemes
 from copy import deepcopy
 import utils
-
-
-def dictionify(resultset, labelset, single=False):
-    if not single:
-        res = []
-        for i in resultset:
-            row = []
-            for a, b in zip(i, labelset):
-                row.append({b: a})
-            res.append(row)
-        return res
-    else:
-        res = {}
-        for a, b in zip(resultset, labelset):
-            res.update({b: a})
-        return res
+from utils import dictionify
 
 
 class DbConnection:
@@ -113,29 +98,29 @@ class DposNode:
             del self.columnlabels[x]['table']
 
     def account_details(self, address):
-        resultset = self._cursor.execute_and_fetchone("""
-        SELECT {mem_accounts[table]}."{mem_accounts[username]}", {mem_accounts[table]}."{mem_accounts[is_delegate]}",
-        {mem_accounts[table]}."{mem_accounts[second_signature]}", {mem_accounts[table]}."{mem_accounts[address]}", 
-        {mem_accounts[table]}."{mem_accounts[public_key]}", {mem_accounts[table]}."{mem_accounts[second_public_key]}", 
-        {mem_accounts[table]}."{mem_accounts[balance]}", {mem_accounts[table]}."{mem_accounts[vote]}", 
-        {mem_accounts[table]}."{mem_accounts[rate]}",{mem_accounts[table]}."{mem_accounts[multi_signatures]}"
-        FROM {mem_accounts[table]}
-        WHERE {mem_accounts[table]}."{mem_accounts[address]}" = '{address}';
+        resultset = self._cursor.execute_and_fetchone(""" 
+        SELECT mem."{mem_accounts[address]}",     mem."{mem_accounts[username]}", 
+               mem."{mem_accounts[is_delegate]}", mem."{mem_accounts[second_signature]}", 
+               mem."{mem_accounts[public_key]}",  mem."{mem_accounts[second_public_key]}", 
+               mem."{mem_accounts[balance]}",     mem."{mem_accounts[vote]}", 
+               mem."{mem_accounts[rate]}",        mem."{mem_accounts[multi_signatures]}"
+        FROM {mem_accounts[table]} as mem
+        WHERE mem."{mem_accounts[address]}" = '{address}';
         """.format(
             mem_accounts=self.scheme['mem_accounts'],
             address=address))
 
-        labelset = ['username', 'is_delegate', 'second_signature', 'address', 'public_key', 'second_public_key',
-                    'balance', 'vote', 'rate', 'multisignatures',]
+        labelset = ['address', 'username', 'is_delegate', 'second_signature', 'public_key', 'second_public_key',
+                    'balance', 'vote', 'rate', 'multisignatures']
 
-        return dictionify(resultset, labelset, single=True)
+        return dictionify(resultset, labelset, single=True,)
 
     def node_height_details(self):
         resultset = self._cursor.execute_and_fetchone("""
-        SELECT {blocks[table]}."{blocks[id]}", {blocks[table]}."{blocks[timestamp]}",
-        {blocks[table]}."{blocks[height]}", {blocks[table]}."{blocks[generator_public_key]}"
-        FROM {blocks[table]}
-        ORDER BY {blocks[table]}."{blocks[height]}" DESC
+        SELECT blocks."{blocks[id]}", blocks."{blocks[timestamp]}",
+        blocks."{blocks[height]}", blocks."{blocks[generator_public_key]}"
+        FROM {blocks[table]} AS blocks
+        ORDER BY blocks."{blocks[height]}" DESC
         LIMIT 1;
         """.format(blocks=self.scheme['blocks']))
 
@@ -149,13 +134,13 @@ class DposNode:
 
     def all_delegates(self):
         resultset = self._cursor.execute_and_fetchall("""
-        SELECT {mem_accounts[table]}."{mem_accounts[username]}", {mem_accounts[table]}."{mem_accounts[is_delegate]}",
-        {mem_accounts[table]}."{mem_accounts[second_signature]}", {mem_accounts[table]}."{mem_accounts[address]}", 
-        {mem_accounts[table]}."{mem_accounts[public_key]}", {mem_accounts[table]}."{mem_accounts[second_public_key]}", 
-        {mem_accounts[table]}."{mem_accounts[balance]}", {mem_accounts[table]}."{mem_accounts[vote]}", 
-        {mem_accounts[table]}."{mem_accounts[rate]}",{mem_accounts[table]}."{mem_accounts[multi_signatures]}"
-        FROM {mem_accounts[table}
-        WHERE {mem_accounts[table]}."{mem_accounts[is_delegate]}" = 1
+        SELECT mem."{mem_accounts[username]}",         mem."{mem_accounts[is_delegate]}",
+               mem."{mem_accounts[second_signature]}", mem."{mem_accounts[address]}", 
+               mem."{mem_accounts[public_key]}",       mem."{mem_accounts[second_public_key]}", 
+               mem."{mem_accounts[balance]}",          mem."{mem_accounts[vote]}", 
+               mem."{mem_accounts[rate]}",             mem."{mem_accounts[multi_signatures]}"
+        FROM {mem_accounts[table]} AS mem
+        WHERE mem."{mem_accounts[is_delegate]}" = 1
         """.format(mem_accounts=self.scheme['mem_accounts']))
 
         labelset = ['username', 'is_delegate', 'second_signature', 'address', 'public_key', 'second_public_key',
@@ -165,14 +150,14 @@ class DposNode:
 
     def current_delegates(self):
         resultset = self._cursor.execute_and_fetchall("""
-        SELECT {mem_accounts[table]}."{mem_accounts[username]}", {mem_accounts[table]}."{mem_accounts[is_delegate]}",
-        {mem_accounts[table]}."{mem_accounts[second_signature]}", {mem_accounts[table]}."{mem_accounts[address]}", 
-        {mem_accounts[table]}."{mem_accounts[public_key]}", {mem_accounts[table]}."{mem_accounts[second_public_key]}", 
-        {mem_accounts[table]}."{mem_accounts[balance]}", {mem_accounts[table]}."{mem_accounts[vote]}", 
-        {mem_accounts[table]}."{mem_accounts[rate]}",{mem_accounts[table]}."{mem_accounts[multi_signatures]}" 
-        FROM {mem_accounts[table]}
-        WHERE {mem_accounts[table]}."{mem_accounts[is_delegate]}" = 1
-        ORDER BY {mem_accounts[table]}."{mem_accounts[vote]}"
+        SELECT mem."{mem_accounts[username]}",         mem."{mem_accounts[is_delegate]}",
+               mem."{mem_accounts[second_signature]}", mem."{mem_accounts[address]}", 
+               mem."{mem_accounts[public_key]}",       mem."{mem_accounts[second_public_key]}", 
+               mem."{mem_accounts[balance]}",          mem."{mem_accounts[vote]}", 
+               mem."{mem_accounts[rate]}",             mem."{mem_accounts[multi_signatures]}" 
+        FROM {mem_accounts[table]} AS mem
+        WHERE mem."{mem_accounts[is_delegate]}" = 1
+        ORDER BY mem."{mem_accounts[vote]}"
         LIMIT {num_delegates}
         """.format(mem_accounts=self.scheme['mem_accounts'],
                    num_delegates=self.num_delegates))
@@ -184,81 +169,93 @@ class DposNode:
 
     def payouts_to_address(self, address):
         resultset = self._cursor.execute_and_fetchall("""
-        SELECT DISTINCT {transactions[table]}."{transactions[id]}", {transactions[table]}."{transactions[amount]}",
-               {transactions[table]}."{transactions[timestamp]}", {transactions[table]}."{transactions[recipient_id]}",
-               {transactions[table]}."{transactions[sender_id]}", {transactions[table]}."{transactions[type]}", 
-               {transactions[table]}."{transactions[fee]}", {mem_accounts[table]}."{mem_accounts[username]}", 
-               {mem_accounts[table]}."{mem_accounts[public_key]}"
-        FROM {transactions[table]}, {mem_accounts[table]}       
-        WHERE {mem_accounts[table]}."{mem_accounts[address]}" = {transactions[table]}."{transactions[sender_id]}"
-        AND {mem_accounts[table]}."{mem_accounts[is_delegate]}" = 1
-        AND {transactions[table]}."{transactions[recipient_id]}" = '{address}'
-        ORDER BY {transactions[table]}."{transactions[timestamp]}" ASC
+        SELECT DISTINCT trs."{transactions[id]}", trs."{transactions[amount]}",
+               trs."{transactions[timestamp]}", trs."{transactions[recipient_id]}",
+               trs."{transactions[sender_id]}", trs."{transactions[type]}", 
+               trs."{transactions[fee]}", mem."{mem_accounts[username]}", 
+               mem."{mem_accounts[public_key]}", blocks."{blocks[height]}"
+        FROM {mem_accounts[table]} mem   
+          INNER JOIN {transactions[table]} trs 
+          ON 
+          (trs."{transactions[sender_id]}"=mem."{mem_accounts[address]}")
+          INNER JOIN {blocks[table]} blocks
+          ON (blocks."{blocks[id]}" = trs."{transactions[block_id]}")
+        WHERE trs."{transactions[recipient_id]}" = '{address}'
+        AND mem."{mem_accounts[is_delegate]}" = 1 
+        ORDER BY blocks."{blocks[height]}" ASC
         """.format(
             transactions=self.scheme['transactions'],
             mem_accounts=self.scheme['mem_accounts'],
             address=address,
-        ))
+            blocks=self.scheme['blocks']))
 
         labelset = ['id', 'amount', 'timestamp', 'recipient_id', 'sender_id',
-                    'rawasset', 'type', 'fee', 'username', 'public_key']
+                    'rawasset', 'type', 'fee', 'username', 'public_key', 'height']
 
         return dictionify(resultset, labelset)
 
     def transactions_from_address(self, address):
         resultset = self._cursor.execute_and_fetchall("""
-        SELECT {transactions[table]}."{transactions[id]}", {transactions[table]}."{transactions[amount]}",
-               {transactions[table]}."{transactions[timestamp]}", {transactions[table]}."{transactions[recipient_id]}",
-               {transactions[table]}."{transactions[sender_id]}", {transactions[table]}."{transactions[type]}",
-               {transactions[table]}."{transactions[fee]}"
-        FROM {transactions[table]}
-        WHERE {transactions[table]}."{transactions[sender_id]}" = '{address}'
-        OR {transactions[table]}."{transactions[recipient_id]}" = '{address}'
-        ORDER BY {transactions[table]}."{transactions[timestamp]}" ASC
+        SELECT trs."{transactions[id]}", trs."{transactions[amount]}",
+               trs."{transactions[timestamp]}", trs."{transactions[recipient_id]}",
+               trs."{transactions[sender_id]}", trs."{transactions[type]}",
+               trs."{transactions[fee]}", blocks."{blocks[height]}"
+        FROM {transactions[table]} AS trs, 
+             {blocks[table]} AS blocks
+        WHERE trs."{transactions[sender_id]}" = '{address}'
+        OR trs."{transactions[recipient_id]}" = '{address}'
+        AND blocks."{blocks[id]}" = trs."{transactions[block_id]}"
+        ORDER BY {blocks[table]}."{blocks[height]}" ASC
         """.format(transactions=self.scheme['transactions'],
-                   address=address))
+                   address=address,
+                   blocks=self.scheme['blocks']))
 
-        labelset = ['id', 'amount', 'timestamp', 'recipient_id', 'sender_id', 'type', 'fee',]
+        labelset = ['id', 'amount', 'timestamp', 'recipient_id', 'sender_id', 'type', 'fee', 'height']
 
-        return dictionify(resultset, labelset)
+        print(dictionify(resultset, labelset))
 
     def all_votes_by_address(self, address):
         resultset = self._cursor.execute_and_fetchall("""
         SELECT {transactions[table]}."{transactions[timestamp]}", {votes[table]}."{votes[votes]}",
-        {mem_accounts[table]}."{mem_accounts[username]}", {mem_accounts[table]}."{mem_accounts[address]}", 
-        ENCODE({mem_accounts[table]}."{mem_accounts[public_key]}"::BYTEA, 'hex')
-        FROM {transactions[table]}, {votes[table]}, {mem_accounts[table]}
+               {mem_accounts[table]}."{mem_accounts[username]}", {mem_accounts[table]}."{mem_accounts[address]}",
+               {blocks[table]}."{blocks[height]}", 
+               ENCODE({mem_accounts[table]}."{mem_accounts[public_key]}"::BYTEA, 'hex')
+        FROM {transactions[table]}, {votes[table]}, {mem_accounts[table]}, {blocks[table]}
         WHERE {transactions[table]}."{transactions[id]}" = {votes[table]}."{votes[transaction_id]}"
         AND {transactions[table]}."{transactions[sender_id]}" = '{address}'
+        AND {blocks[table]}."{blocks[id]}" = {transactions[table]}."{transactions[block_id]}"
         AND TRIM(LEADING '+-' FROM {votes[table]}.{votes[votes]}) = ENCODE({mem_accounts[table]}."{mem_accounts[public_key]}"::BYTEA, 'hex')
-        ORDER BY {transactions[table]}."{transactions[timestamp]}" ASC;
+        ORDER BY {blocks[table]}."{blocks[height]}" ASC;
         """.format(transactions=self.scheme['transactions'],
                    votes=self.scheme['votes'],
                    mem_accounts=self.scheme['mem_accounts'],
-                   address=address))
+                   address=address,
+                   blocks=self.scheme['blocks']))
 
-        labelset = ['timestamp', 'vote', 'username', 'address', 'public_key']
+        labelset = ['timestamp', 'vote', 'username', 'address', 'public_key', 'height']
 
         return dictionify(resultset, labelset)
 
     def calculate_balance_over_time(self, address):
         resultset = self._cursor.execute_and_fetchall("""
-        SELECT DISTINCT {transactions[table]}."{transactions[id]}" as a, 'tx' as b,
+        SELECT {transactions[table]}."{transactions[id]}" as a, 'tx' as b,
         {transactions[table]}."{transactions[amount]}" as c, {transactions[table]}."{transactions[fee]}" as d, 
-        {transactions[table]}."{transactions[sender_id]}" as e, {transactions[table]}."{transactions[timestamp]}" as f
-        FROM {transactions[table]}
+        {transactions[table]}."{transactions[sender_id]}" as e, {transactions[table]}."{transactions[timestamp]}" as f,
+        {blocks[table]}."{blocks[height]}" as g
+        FROM {transactions[table]}, {blocks[table]}
         WHERE {transactions[table]}."{transactions[sender_id]}" = '{address}'
         OR {transactions[table]}."{transactions[recipient_id]}" = '{address}'
-        UNION ALL
-        SELECT DISTINCT {blocks[table]}."{blocks[id]}" as a, 'block' as b, {blocks[table]}."{blocks[reward]}" as c, 
-        {blocks[table]}."{blocks[total_fee]}" as d, NULL as e, {blocks[table]}."{blocks[timestamp]}" as f
+        AND {blocks[table]}."{blocks[id]}" = {transactions[table]}."{transactions[block_id]}"
+        UNION 
+        SELECT {blocks[table]}."{blocks[id]}" as a, 'block' as b, {blocks[table]}."{blocks[reward]}" as c, 
+        {blocks[table]}."{blocks[total_fee]}" as d, NULL as e, {blocks[table]}."{blocks[timestamp]}" as f, 
+        {blocks[table]}."{blocks[height]}" as g
         FROM {blocks[table]}
         WHERE {blocks[table]}."{blocks[generator_public_key]}" = (
           SELECT {mem_accounts[table]}."{mem_accounts[public_key]}"
           FROM {mem_accounts[table]}
-          WHERE {mem_accounts[table]}."{mem_accounts[address]}" = '{address}'
-        )
-        ORDER BY f ASC
+          WHERE {mem_accounts[table]}."{mem_accounts[address]}" = '{address}'        )
+        ORDER BY g ASC
         """.format(transactions=self.scheme['transactions'],
                    blocks=self.scheme['blocks'],
                    mem_accounts=self.scheme['mem_accounts'],
@@ -278,7 +275,87 @@ class DposNode:
             elif i[1] == 'block':
                 balance += i[2] + i[3]
                 res.update({i[5]: balance})
+        print(res)
         return res
+
+    def get_last_out_transactions(self, address):
+        resultset = self._cursor.execute_and_fetchall("""
+            SELECT ts."{transactions[recipient_id]}", ts."{transactions[id]}", ts."{transactions[timestamp]}", 
+                   ts."{transactions[amount]}", bs.{blocks[height]}
+            FROM {transactions[table]} ts, {blocks[table]} bs,
+                (SELECT MAX({transactions[table]}."{transactions[timestamp]}") AS max_timestamp, 
+                        {transactions[table]}."{transactions[recipient_id]}"
+                 FROM {transactions[table]}
+                 WHERE {transactions[table]}."{transactions[sender_id]}" = '{address}'
+                 GROUP BY {transactions[table]}."{transactions[recipient_id]}") maxresults
+            WHERE ts."{transactions[recipient_id]}" = maxresults."{transactions[recipient_id]}"
+            AND bs."{blocks[id]}" = ts."{transactions[id]}"
+
+            AND ts."{transactions[timestamp]}"= maxresults.max_timestamp;
+                            """.format(transactions=self.scheme['transactions'],
+                                       address=address,
+                                       blocks=self.scheme['blocks']))
+
+        labelset = ['recipient_id', 'id', 'timestamp', 'amount', 'height']
+
+        return dictionify(resultset, labelset)
+
+    def get_address_all_voters(self, address):
+        resultset = self._cursor.execute_and_fetchall("""
+            SELECT {transactions[table]}."{transactions[recipient_id]}", 
+                   MAX({transactions[table]}."{transactions[timestamp]}"),
+                   {blocks[table]}."{blocks[height]}",
+                   {transactions[table]}."{transactions[amount]}"
+            FROM {transactions[table]}, {transactions[votes]}, {blocks[table]}
+            WHERE {transactions[table]}."{transactions[id]}" = {transactions[table]}."{transactions[transaction_id]}"
+            AND {blocks[table]}."{blocks[id]}" = {transactions[table]}."{transactions[block_id]}"
+            AND {transactions[table]}."{transactions[votes]}" = (
+                SELECT {mem_accounts[table]}"{mem_accounts[public_key]}" 
+                FROM {mem_accounts[table]}
+                WHERE {mem_accounts[table]}"{mem_accounts[address]}" = {address}
+            )
+            ORDER BY {blocks[table]}."{blocks[height]}" ASC;
+               """.format(transactions=self.scheme['transactions'],
+                          mem_accounts=self.scheme['mem_accounts'],
+                          address=address,
+                          blocks=self.scheme['blocks']))
+
+        labelset = ['address', 'timestamp', 'height', 'amount']
+
+        return dictionify(resultset, labelset)
+
+    def get_current_voters_for_address(self, address):
+        resultset = self._cursor.execute_and_fetchall("""
+            SELECT {transactions[table]}."{transactions[recipient_id]}", AS voter
+                   MAX({transactions[table]}."{transactions[timestamp]}"),
+                   {blocks[table]}."{blocks[height]}" 
+            FROM {transactions[table]}, {transactions[votes]}, {blocks[table]}
+            WHERE {transactions[table]}."{transactions[id]}" = {transactions[table]}."{transactions[transaction_id]}"
+            AND {blocks[table]}."{blocks[id]}" = {transactions[table]}."{transactions[block_id]}"
+            AND {transactions[table]}."{transactions[votes]}" = (
+              SELECT {mem_accounts[table]}"{mem_accounts[public_key]}" 
+              FROM {mem_accounts[table]}
+              WHERE {mem_accounts[table]}"{mem_accounts[address]}" = {address}
+            ) 
+            WHERE voter IN (
+              SELECT {mem_accounts2delegate[table]}."{mem_accounts2delegate[account_id]}"
+              FROM {mem_accounts2delegate[table]}
+              WHERE {mem_accounts2delegate[table]}."{mem_accounts2delegate[public_key]}" = (
+                SELECT {mem_accounts[table]}"{mem_accounts[public_key]}" 
+                FROM {mem_accounts[table]}
+                WHERE {mem_accounts[table]}"{mem_accounts[address]}" = {address}
+              )
+            )
+            ORDER BY {blocks[table]}."{blocks[height]}" ASC;  
+        """.format(transactions=self.scheme['transactions'],
+                   mem_accounts=self.scheme['mem_accounts'],
+                   mem_accounts2delegate=self.scheme['mem_accounts2delegate'],
+                   blocks=self.scheme['blocks'],
+                   address=address))
+
+        labelset = ['address', 'timestamp', 'blocks']
+
+        return dictionify(resultset, labelset)
 
 
 class ArkNode(DposNode):

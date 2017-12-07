@@ -24,10 +24,11 @@ class TestNodeArk(TestCase):
             password='arkarkbarkbark',
             database='ark_mainnet',
         )
-
-        details = myarknode.account_details('AXx4bD2qrL1bdJuSjePawgJxQn825aNZZC')
+        address = 'AXx4bD2qrL1bdJuSjePawgJxQn825aNZZC'
+        details = myarknode.account_details(address)
         self.assertIsInstance(details, dict)
         self.assertIsNotNone(details)
+        self.assertEquals(details['address'], address)
 
     def test_node_height_details(self):
         import dbtools
@@ -83,8 +84,11 @@ class TestNodeArk(TestCase):
             database='ark_mainnet',
         )
 
-        payouts = myarknode.payouts_to_address('AJwHyHAArNmzGfmDnsJenF857ATQevg8HY')
+        payouts = myarknode.payouts_to_address('AMbR3sWGzF3rVqBrgYRnAvxL2TVh44ZEft')
         self.assertIsInstance(payouts, list)
+        for i in payouts:
+            self.assertIn()
+
 
     def test_transactions_from_address(self):
         import dbtools
@@ -140,3 +144,20 @@ class TestNodeArk(TestCase):
 
         # shaman apparently left 1 ark satoshi on his account
         self.assertTrue(balance_over_time_delegate_address[19815336] == 1)
+
+    def test_get_last_out_transactions(self):
+        import dbtools
+
+        myarknode = dbtools.ArkNode(
+            host='localhost',
+            user='guestark',
+            password='arkarkbarkbark',
+            database='ark_mainnet',
+        )
+
+        last_payouts = myarknode.get_last_out_transactions('AJRZHsHjqED3E3h55Ai9H6DtuoWUiBjLo7')
+
+        self.assertIsInstance(last_payouts, list)
+        self.assertIsNotNone(last_payouts)
+
+        self.assertTrue(last_payouts[-1]['address'] == 'Aa99TgGBMor5jssbzhUKHtDQMRfQukUeTM')
