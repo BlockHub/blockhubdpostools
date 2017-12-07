@@ -1,0 +1,128 @@
+coin_specific_info:
+     table: coin_specific_info
+     number_of_delegates: None
+blocks:
+     table: blocks
+     id: id
+     row_id: rowId
+     version: version
+     timestamp: timestamp
+     height: height
+     previous_block: previousBlock
+     number_of_transactions: numberOfTransactions
+     total_amout: totalAmount
+     total_fee: totalFee
+     reward: reward
+     payload_length: payLoadLength
+     payload_hash: payloadHash
+     generator_public_key: generatorPublicKey
+     block_signature: blockSignature
+delegates:
+     table: delegates
+     username: username
+     transaction_id: transactionId
+forks_stat:
+     table: forks_stat
+     delegate_publick_key: delegatePublicKey
+     block_timestamp: blockTimestamp
+     block_id: blockId
+     block_height: blockHeight
+     previous_block: previousBlock
+     cause: cause
+mem_accounts:
+     table: mem_accounts
+     username: username
+     is_delegate: isDelegate
+     u_is_delegate: u_isDelegate
+     second_signature: secondSignature
+     u_second_signature: u_secondSignature
+     u_username: u_username
+     address: address
+     public_key: publicKey
+     second_public_key: secondPublicKey
+     balance: balance
+     u_balance: u_balance
+     vote: vote
+     rate: rate
+     delegates: delegates
+     u_delegates: u_delegates
+     multi_signatures: multisignatures
+     u_multi_signatures: u_multisignatures
+     multi_min: multimin
+     u_multi_min: u_multimin
+     multi_life_time: multilifetime
+     u_multi_life_time: u_multilifetime
+     block_id: blockId
+     name_exist: nameexist
+     u_name_exist: u_nameexist
+     produced_blocks: producedblocks
+     missed_blocks: missedblocks
+     fees: fees
+     rewards: rewards
+     virgin: virgin
+mem_accounts2delegates:
+     table: mem_accounts2delegates
+     account_id: accountId
+     dependent_id: dependentId
+mem_accounts2multisignatures:
+     table: mem_accounts2multisignatures
+     account_id: accountId
+     dependent_id: dependentId
+mem_accounts2u_delegates:
+     table: mem_accounts2u_delegates
+     account_id: accountId
+     dependent_id: dependentId
+mem_accounts2u_multisignatures:
+     table: mem_accounts2u_multisignatures
+     account_id: accountId
+     dependent_id: dependentId
+mem_delegates:
+     table: mem_delegates
+     public_key: publicKey
+     vote: vote
+     round: round
+     produced_blocks: producedblocks
+     missed_blocks: missedblocks
+migrations:
+     table: migrations
+     id: id
+     name: name
+multisignatures:
+     table: multisignatures
+     min: min
+     lifetime: lifetime
+     keysgroup: keysgroup
+     transactionId: transactionId
+peers:
+     table: peers
+     id: integer
+     ip: inet
+     port: port
+     state: state
+     os: os
+     version: character
+     clock: bigint
+signatures:
+     table: signatures
+     transaction_id: transactionId
+     public_key: publicKey
+transactions:
+     table: transactions
+     id: id
+     row_id: rowId
+     block_id: blockId
+     type: type
+     timestamp: timestamp
+     sender_public_key: senderPublicKey
+     sender_id: senderId
+     recipient_id: recipientId
+     amount: amount
+     fee: fee
+     signature: signature
+     sign_signature: signSignature
+     requester_public_key: requesterPublicKey
+     signatures: signatures
+votes:
+     table: votes
+     votes: votes
+     transaction_id: transactionId
