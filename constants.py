@@ -4,7 +4,6 @@ TX_FEE = 10000000
 
 """Peers managed by BlockHub, these are automatically used"""
 BlockHubPEERSArk = [
-    '146.185.144.47',
     '94.16.121.35',
     '94.16.121.39',
 
