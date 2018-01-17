@@ -32,6 +32,8 @@ class Network:
         elif network == 'dark':
             self.PEERS = ['http://{}:4002'.format(x) for x in constants.BlockHubPEERSDark]
 
+        arky.rest.use(network=self.network)
+
     def add_peer(self, peer):
         """
         Add a peer or multiple peers to the PEERS variable, takes a single string or a list.
@@ -101,7 +103,6 @@ class Network:
 
     def broadcast_tx(self, address, amount, secret, secondsecret=None, vendorfield=''):
         """broadcasts a transaction to the peerslist"""
-        arky.rest.use(network=self.network)
         arky.rest.cfg.peers = self.PEERS
 
         res = arky.core.sendTransaction(

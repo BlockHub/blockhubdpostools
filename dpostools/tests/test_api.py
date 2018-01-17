@@ -38,7 +38,7 @@ class TestNetwork(TestCase):
     def test_remove_peer(self):
         from dpostools import api
         from dpostools import constants
-        correct_url = 'http://146.185.144.47:4001'
+        correct_url = 'http://94.16.121.39:4001'
         ark_network = api.Network(network='ark')
 
         ark_network.remove_peer(correct_url)
