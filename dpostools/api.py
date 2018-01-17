@@ -1,9 +1,8 @@
 """Some additional functions related to arky by Moustikitos (pre-AIP11)"""
 
-import constants
+from dpostools import constants, exceptions
 import arky.rest
 import requests
-import exceptions
 import re
 import random
 

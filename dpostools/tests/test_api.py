@@ -3,8 +3,8 @@ from unittest import TestCase
 
 class TestNetwork(TestCase):
     def test_check_url(self):
-        import api
-        import exceptions
+        from dpostools import api
+        from dpostools import exceptions
         correct_url = 'http://146.185.144.47:4001'
         incorrect_url = '146.185.144.47'
 
@@ -12,8 +12,8 @@ class TestNetwork(TestCase):
         self.assertRaises(exceptions.PeerFormatError, api.check_url, incorrect_url)
 
     def test_network_init_ark(self):
-        import api
-        import constants
+        from dpostools import api
+        from dpostools import constants
         ark_network_peers = api.Network(network='ark').PEERS
         self.assertTrue(len(ark_network_peers) == len(constants.BlockHubPEERSArk))
 
@@ -21,9 +21,9 @@ class TestNetwork(TestCase):
             self.assertEqual(y, 'http://{}:4001'.format(x))
 
     def test_add_peer(self):
-        import api
-        import exceptions
-        import constants
+        from dpostools import api
+        from dpostools import exceptions
+        from dpostools import constants
 
         correct_url = 'http://146.185.144.47:4001'
         incorrect_url = '146.185.144.47'
@@ -36,24 +36,24 @@ class TestNetwork(TestCase):
         self.assertRaises(exceptions.PeerFormatError, ark_network.add_peer, incorrect_url)
 
     def test_remove_peer(self):
-        import api
-        import constants
+        from dpostools import api
+        from dpostools import constants
         correct_url = 'http://146.185.144.47:4001'
         ark_network = api.Network(network='ark')
 
         ark_network.remove_peer(correct_url)
 
-        self.assertTrue(len(ark_network.PEERS) == len(constants.BlockHubPEERSArk) -1)
+        self.assertTrue(len(ark_network.PEERS) == len(constants.BlockHubPEERSArk) - 1)
 
     def test_clear_peer(self):
-        import api
+        from dpostools import api
 
         ark_network = api.Network(network='ark')
 
         self.assertFalse(ark_network.clear_peers())
 
     def test_status(self):
-        import api
+        from dpostools import api
 
         ark_network = api.Network(network='ark')
         status = ark_network.status()
@@ -68,7 +68,7 @@ class TestNetwork(TestCase):
 
     def test_testnet_broadcast(self):
         """This is a devnet wallet. Please don't clear it, the dark isn't worth anything."""
-        import api
+        from dpostools import api
 
         dark_network = api.Network(network='dark')
         recipient_address = 'DA1SPukujJqfVqiGfq9yFUnnEucpxevgbA'
@@ -96,7 +96,7 @@ class TestNetwork(TestCase):
 
     def test_mainnet_broadcast(self):
         """Not going to send actual ark here (ark is money, friend!)"""
-        import api
+        from dpostools import api
         ark_network = api.Network(network='ark')
 
         recipient = 'Aa5ASKhEpCv11vmQCysLvU3BXdEkkwpZZi'

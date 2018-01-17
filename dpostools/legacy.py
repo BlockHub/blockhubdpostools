@@ -1,7 +1,4 @@
 """Legacy arkdbtools code, because I haven't gotten around to rewriting everything yet."""
-
-
-
 import psycopg2
 from arkdbtools import utils
 import arkdbtools.config as c
@@ -10,7 +7,6 @@ import binascii
 import datetime
 import logging
 import requests.exceptions as rq
-
 
 
 if c.LOGGING['USE']:
