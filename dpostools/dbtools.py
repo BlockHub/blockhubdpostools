@@ -105,7 +105,7 @@ class DposNode:
         return dictionify(resultset, labelset, single=True)
 
     def check_node_height(self, max_difference):
-        if api.Network(network=self.network).status()['height'] - self.node_height_details()['height'] > max_difference:
+        if api.Network(network=self.network).status()['network_height'] - self.node_height_details()['height'] > max_difference:
             return False
         return True
 

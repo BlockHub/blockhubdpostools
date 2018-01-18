@@ -1,12 +1,9 @@
 """Legacy arkdbtools code, because I haven't gotten around to rewriting everything yet."""
 import psycopg2
-from arkdbtools import utils
-import arkdbtools.config as c
+from dpostools import legacy_constants as c
 from collections import namedtuple
 import binascii
-import datetime
 import logging
-import requests.exceptions as rq
 
 
 if c.LOGGING['USE']:
@@ -135,6 +132,7 @@ class DbCursor:
     def execute_and_fetchone(self, qry, *args):
         self.execute(qry, *args)
         return self._cur.fetchone()
+
 
 class Node:
     @staticmethod

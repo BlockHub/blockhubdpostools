@@ -1,7 +1,7 @@
 """Some additional functions related to arky by Moustikitos (pre-AIP11)"""
 
 from dpostools import constants, exceptions
-import arky.rest
+from park.park import Park
 import requests
 import re
 import random
@@ -28,17 +28,15 @@ class Network:
         self.network = network
 
         if network == 'ark':
-            self.PEERS = ['http://{}:4001'.format(x) for x in constants.BlockHubPEERSArk]
+            self.PEERS = [x for x in constants.BlockHubPEERSArk]
         elif network == 'dark':
-            self.PEERS = ['http://{}:4002'.format(x) for x in constants.BlockHubPEERSDark]
+            self.PEERS = [x for x in constants.BlockHubPEERSDark]
 
-        arky.rest.use(network=self.network)
 
     def add_peer(self, peer):
         """
         Add a peer or multiple peers to the PEERS variable, takes a single string or a list.
 
-        Format: 'http://{}:port'
         :param peer(list or string)
         """
         if type(peer) == list:
@@ -82,7 +80,8 @@ class Network:
         :return: network_height, peer_status
         """
         peer = random.choice(self.PEERS)
-        peerdata = requests.get(url=peer + '/api/peers/').json()['peers']
+        formatted_peer = 'http://{}:4001'.format(peer)
+        peerdata = requests.get(url=formatted_peer + '/api/peers/').json()['peers']
         peers_status = {}
 
         networkheight = max([x['height'] for x in peerdata])
@@ -102,25 +101,16 @@ class Network:
         }
 
     def broadcast_tx(self, address, amount, secret, secondsecret=None, vendorfield=''):
-        """broadcasts a transaction to the peerslist"""
-        arky.rest.cfg.peers = self.PEERS
+        """broadcasts a transaction to the peerslist using ark-js library"""
 
-        res = arky.core.sendTransaction(
-            amount=amount,
-            recipientId=address,
-            secret=secret,
-            secondSecret=secondsecret
+        peer = random.choice(self.PEERS)
+        park = Park(
+            peer,
+            4001,
+            constants.ARK_NETHASH,
+            '1.1.1'
         )
 
-        success = False
-        percentage = 0
+        return park.transactions().create(address, str(amount), vendorfield, secret, secondsecret)
 
-        if res['broadcast']:
-            success = True
-            percentage = res['broadcast']
 
-        return {
-            'success': success,
-            'responses': res,
-            'percentage': percentage,
-        }
